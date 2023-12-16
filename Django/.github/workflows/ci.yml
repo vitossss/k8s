@@ -1,0 +1,27 @@
+name: CI
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v3
+    - 
+      name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - 
+      name: Install pip packages
+      run: pip install --upgrade pip
+    - 
+      name: Install lint packages
+      run: pip install "black<23" flake8 pycodestyle
+    - run: black --line-length 79 --check .
+    - run: flake8 . --ignore E501
+    - run: pycodestyle . --ignore E501

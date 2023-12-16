@@ -1,0 +1,42 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: react
+  template:
+    metadata:
+      labels:
+        component: react
+    spec:
+      containers:
+        - name: react-container
+          image: vitaliyshvab/react-app:latest
+          ports:
+            - containerPort: 3000
+          # command: ["sh", "-c", "serve -s build -l 3000 --no-clipboard"]
+          command: ["nginx", "-g", "daemon off;"]
+          env:
+          - name: REACT_APP_API_URL
+            valueFrom:
+              configMapKeyRef:
+                name: app-variables
+                key: REACT_APP_API_URL
+---
+
+# Cluster IP Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: react
+  ports:
+    - port: 3000
+      targetPort: 3000
